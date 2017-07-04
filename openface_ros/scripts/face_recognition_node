@@ -133,12 +133,12 @@ if __name__ == '__main__':
 
     try:
         dlib_shape_predictor_path = os.path.expanduser(
-            rospy.get_param("~align_path", "~/openface/models/dlib/shape_predictor_68_face_landmarks.dat"))
+            rospy.get_param("~align_path", "~/src/openface/models/dlib/shape_predictor_68_face_landmarks.dat"))
         openface_neural_network_path = os.path.expanduser(
-            rospy.get_param("~net_path", "~/openface/models/openface/nn4.small2.v1.t7"))
+            rospy.get_param("~net_path", "~/src/openface/models/openface/nn4.small2.v1.t7"))
         save_images = rospy.get_param("~save_images", True)
 
-        db = rospy.get_param('~db', None)
+        db = rospy.get_param('~db', "~/catkin_ws/src/image_recognition/openface_ros/trained.out")
         if db:
             db = os.path.expanduser(db)
 

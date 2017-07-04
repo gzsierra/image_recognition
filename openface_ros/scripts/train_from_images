@@ -23,12 +23,13 @@ def main(modeldir, outfile, align_path, net_path, verbose):
         logger.info('loading images for %s', cat)
         path = os.path.join(modeldir, cat)
 
-        logger.debug('loading images from %s', path)
+        logger.info('loading images from %s', path)
         for fname in os.listdir(path):
             f = os.path.join(path, fname)
             logger.debug('processing %s', f)
 
             img = cv2.imread(f, 1) # load as color
+            print img
 
             try:
                 logger.debug('training...')
@@ -56,13 +57,14 @@ class ReadableDir(Action):
 if __name__ == '__main__':
     parser = ArgumentParser(description='Train openface from a database of images')
 
-    parser.add_argument('modeldir', action=ReadableDir, help='Directory with folders for each category')
-    parser.add_argument('outfile', type=FileType('w'), help='Where to output the trained faces database')
+    parser.add_argument('-m', '--modeldir', action=ReadableDir, help='Directory with folders for each category',
+                        default="/tmp/openface/annotated/verified")
+    parser.add_argument('-o','--outfile', type=FileType('w'), help='Where to output the trained faces database')
 
     parser.add_argument('-k', '--align_path', type=str, help='DLib Align path', required=False,
-                        default="~/openface/models/dlib/shape_predictor_68_face_landmarks.dat")
+                        default="~/src/openface/models/dlib/shape_predictor_68_face_landmarks.dat")
     parser.add_argument('-s', '--net_path', type=str, help='Openface neural network path', required=False,
-                        default='~/openface/models/openface/nn4.small2.v1.t7')
+                        default='~/src/openface/models/openface/nn4.small2.v1.t7')
 
     parser.add_argument('-v', '--verbose', action='store_true')
 

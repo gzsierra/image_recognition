@@ -4,9 +4,9 @@ import rostopic
 
 from qt_gui.plugin import Plugin
 
-from python_qt_binding.QtWidgets import * 
-from python_qt_binding.QtGui import * 
-from python_qt_binding.QtCore import * 
+from python_qt_binding.QtWidgets import *
+from python_qt_binding.QtGui import *
+from python_qt_binding.QtCore import *
 
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
@@ -48,9 +48,9 @@ class AnnotationPlugin(Plugin):
 
         self._widget = QWidget()
         context.add_widget(self._widget)
-        
+
         # Layout and attach to widget
-        layout = QVBoxLayout()  
+        layout = QVBoxLayout()
         self._widget.setLayout(layout)
 
         self._image_widget = ImageWidget(self._widget, self.image_roi_callback, clear_on_click=True)
@@ -150,7 +150,7 @@ class AnnotationPlugin(Plugin):
         if srv_name in rosservice.get_service_list():
             rospy.loginfo("Creating proxy for service '%s'" % srv_name)
             self._srv = rospy.ServiceProxy(srv_name, rosservice.get_service_class_by_name(srv_name))
-            
+
     def store_image(self, roi_image):
         """
         Store the image
@@ -200,7 +200,7 @@ class AnnotationPlugin(Plugin):
     def _image_callback(self, msg):
         """
         Called when a new sensor_msgs/Image is coming in
-        :param msg: The image messaeg
+        :param msg: The image message
         """
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")

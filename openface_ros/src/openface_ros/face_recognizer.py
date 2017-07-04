@@ -2,6 +2,7 @@
 
 import numpy as np
 import cv2
+from cv_bridge import CvBridge, CvBridgeError
 import os
 
 # Openface
@@ -85,7 +86,7 @@ class L2Distance:
 class RecognizedFace:
     def __init__(self, detection, image, factor_x=0.1, factor_y=0.2):
         """
-        A Recognized face in an imaeg
+        A Recognized face in an image
         :param detection: The actual detection from dlib
         :param image: The original image
         :param factor_x: Upscale factor x
@@ -116,6 +117,8 @@ class FaceRecognizer:
         self._net = openface.TorchNeuralNet(os.path.expanduser(net_path), imgDim=96, cuda=False)
         self._face_detector = dlib.get_frontal_face_detector()
         self._trained_faces = []
+        # self.bridge = CvBridge()
+        # self.cv_image = None
 
     def update_with_categorical_distribution(self, recognition):
         """

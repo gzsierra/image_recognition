@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+import argparse
+import cv2
+import rospy
+from openface_ros.face_recognizer import FaceRecognizer
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+
+
+# Assign description to the help doc
+parser = argparse.ArgumentParser(description='Get face properties using the Skybiometry API')
+
+# Add arguments
+parser.add_argument('-i', '--image', type=str, help='Image', required=False)
+parser.add_argument('-t', '--topic', type=str, help='Image Topic', required=False,
+                    default="/usb_cam/image_raw")
+parser.add_argument('-T', '--Train', type=int, help='Train a new name', required=False,
+                    default=0)
+parser.add_argument('-n', '--name', type=str, help='Name', required=False)
+parser.add_argument('-k', '--align_path', type=str, help='DLib Align path', required=False,
+                    default="~/src/openface/models/dlib/shape_predictor_68_face_landmarks.dat")
+parser.add_argument('-s', '--net_path', type=str, help='Openface neural network path', required=False,
+                    default='~/src/openface/models/openface/nn4.small2.v1.t7')
+parser.add_argument('-d', '--db', type=argparse.FileType('r'), help='Load already trained faces db from file')
+parser.add_argument('-v', '--verbose', help="Increase output verbosity", action="store_true")
+args = parser.parse_args()
+
+# cv_image=None
+bridge = CvBridge()
+face_recognizer = FaceRecognizer(args.align_path, args.net_path)
+
+if args.db:
+    face_recognizer.restore_trained_faces(args.db)
+
+# face = frame[y:y+h,x:x+w]
+
+
+def _create_subscriber(topic_name):
+    """
+    Method that creates a subscriber to a sensor_msgs/Image topic
+    :param topic_name: The topic_name
+    """
+    rospy.init_node('listener', anonymous=True)
+    sub = rospy.Subscriber(topic_name, Image, callback)
+    rospy.loginfo("Listening to %s -- spinning .." % sub.name)
+    # rospy.spin()
+
+def callback(msg):
+    """
+    Method that will get a image from a topic
+    :param topic: The msg from subscriber listenning on ex: `/usb_cam/image_raw`
+    """
+    try:
+        cv_image = bridge.imgmsg_to_cv2(msg, "bgr8")
+        train(cv_image)
+        recognize(cv_image)
+    except CvBridgeError as e:
+        rospy.logerr(e)
+
+
+def train(cv_image):
+    # Pretty print the output
+    if cv_image is not None:
+        try:
+# face = frame[y:y+h,x:x+w]
+
+            face_recognizer.train(cv_image, "Nic")
+            # face_recognizer.save_trained_faces("openface.db")
+        except Exception as e:
+            print "An error occurred: %s" % e
+    else:
+        print("Image is None...")
+
+def recognize(cv_image):
+    # Pretty print the output
+    try:
+        print face_recognizer.recognize(cv_image)
+    except Exception as e:
+        print "An error occurred: %s" % e
+
+
+if __name__ == '__main__':
+    _create_subscriber(args.topic)
